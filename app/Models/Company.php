@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Company extends Model
 {
@@ -13,4 +14,10 @@ class Company extends Model
     {
         return $this->belongsTo(Organization::class);
     }
+
+    public function users(): HasMany
+    {
+        return $this->hasMany(User::class);
+    }
+
 }

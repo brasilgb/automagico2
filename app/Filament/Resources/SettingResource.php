@@ -7,6 +7,7 @@ use App\Filament\Resources\SettingResource\RelationManagers;
 use App\Models\Setting;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,22 +18,21 @@ class SettingResource extends Resource
 {
     protected static ?string $model = Setting::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-adjustments-vertical';
-    protected static ?string $modelLabel = 'Configuração';
-    protected static ?string $pluralModelLabel = 'Configurações';
-    protected static ?string $navigationLabel = 'Configurações';
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('organization_id')
-                    ->numeric()
+                Forms\Components\Select::make('organization_id')
+                    ->relationship('organization', 'name')
                     ->default(null),
                 Forms\Components\TextInput::make('name')
                     ->maxLength(255)
                     ->default(null),
-                Forms\Components\TextInput::make('logo')
-                    ->maxLength(100)
+                Forms\Components\FileUpload::make('logo')
+                    ->image()
+                    ->columnSpanFull()
                     ->default(null),
             ]);
     }
@@ -41,28 +41,36 @@ class SettingResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('organization_id')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('organization.name')
                     ->sortable(),
+                Tables\Columns\ImageColumn::make('logo')
+                    ->circular()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('logo')
-                    ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->dateTime('d/m/Y H:i')
+                    ->sortable(),
             ])
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ViewAction::make(),
+                Tables\Actions\EditAction::make()
+                ->successNotification(
+                    Notification::make()
+                        ->success()
+                        ->title('Configuração editada')
+                        ->body('A configuração foi editada com sucesso.')
+                ),
+                Tables\Actions\DeleteAction::make()
+                    ->successNotification(
+                        Notification::make()
+                            ->success()
+                            ->title('Configuração deletada')
+                            ->body('A configuração foi deletada com sucesso.')
+                    ),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

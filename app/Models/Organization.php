@@ -10,13 +10,19 @@ class Organization extends Model
 {
     //
 
-    public function users(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
-    }
-
     public function companies(): HasMany
     {
         return $this->hasMany(Company::class);
     }
+
+    public function settings(): HasMany
+    {
+        return $this->hasMany(Setting::class);
+    }
+
+    public function users(): HasMany
+    {
+        return $this->hasMany(User::class);
+    }
+    
 }

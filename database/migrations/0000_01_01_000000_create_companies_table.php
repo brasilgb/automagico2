@@ -17,13 +17,12 @@ return new class extends Migration
             $table->string('altername')->nullable();
             $table->string('corpreason');
             $table->string('cnpj');
-            $table->string('statereg');
             $table->string('subnumber'); // Número da filial
             $table->string('subname'); // Nome da filial
             $table->string('cep');
             $table->string('state');
             $table->string('city')->nullable();
-            $table->string('neighborhood');
+            $table->string('district');
             $table->string('street')->nullable(); // Logradouro
             $table->string('number')->nullable();
             $table->string('complement')->nullable();

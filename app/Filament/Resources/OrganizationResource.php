@@ -7,32 +7,40 @@ use App\Filament\Resources\OrganizationResource\RelationManagers;
 use App\Models\Organization;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Leandrocfe\FilamentPtbrFormFields\Document;
+use Filament\Tables\Actions\CreateAction;
 
 class OrganizationResource extends Resource
 {
     protected static ?string $model = Organization::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-building-office-2';
-    protected static ?int $navigationSort = -2;
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?string $modelLabel = 'Organização';
     protected static ?string $pluralModelLabel = 'Organizações';
     protected static ?string $navigationLabel = 'Organizações';
+    protected static ?int $navigationSort = -2;
+    protected static ?int $new = -2;
+
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
-                    ->required()
+                    ->rules(['required'])
                     ->maxLength(255),
-                Forms\Components\TextInput::make('status')
-                    ->required()
-                    ->maxLength(255),
+                Document::make('cnpj')
+                    ->cnpj('99999999/9999-99')
+                    ->rules(['required', 'cnpj'])
+                    ->maxLength(18),
+                Forms\Components\Toggle::make('status')
+                    ->label('Ativar esta empresa'),
             ]);
     }
 
@@ -41,24 +49,39 @@ class OrganizationResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->label('Organização')
+                    ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('status')
+                Tables\Columns\TextColumn::make('cnpj')
+                    ->label('CNPJ')
+                    ->sortable()
                     ->searchable(),
+                Tables\Columns\ToggleColumn::make('status')
+                    ->label('Status'),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->label('Cadastro')
+                    ->dateTime('d/m/Y H:i')
+                    ->sortable(),
             ])
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ViewAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->successNotification(
+                        Notification::make()
+                            ->success()
+                            ->title('Organização editada')
+                            ->body('A organização foi editada com sucesso.')
+                    ),
+                Tables\Actions\DeleteAction::make()
+                    ->successNotification(
+                        Notification::make()
+                            ->success()
+                            ->title('Organização deletada')
+                            ->body('A organização foi deletada com sucesso.')
+                    ),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -73,4 +96,10 @@ class OrganizationResource extends Resource
             'index' => Pages\ManageOrganizations::route('/'),
         ];
     }
+
+    public function create()
+    {
+       return false;
+    }
+
 }
