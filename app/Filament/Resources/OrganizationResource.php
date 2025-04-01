@@ -25,8 +25,6 @@ class OrganizationResource extends Resource
     protected static ?string $pluralModelLabel = 'Organizações';
     protected static ?string $navigationLabel = 'Organizações';
     protected static ?int $navigationSort = -2;
-    protected static ?int $new = -2;
-
 
     public static function form(Form $form): Form
     {

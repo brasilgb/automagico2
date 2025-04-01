@@ -36,6 +36,7 @@ class UserResource extends Resource
                                 ->label('Organização')
                                 ->relationship('organization', 'name')
                                 ->rules(['required'])
+                                ->reactive()
                                 ->default(null),
                             Forms\Components\Select::make('company_id')
                                 ->label('Filial')
