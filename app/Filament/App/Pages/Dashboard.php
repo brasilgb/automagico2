@@ -13,6 +13,4 @@ class Dashboard extends BasePage
 
     protected static ?string $navigationLabel = 'Dashboard';
 
-
-
 }
